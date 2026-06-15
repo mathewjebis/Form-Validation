@@ -4,7 +4,7 @@ A sleek, modern, and secure **Account Creation Form** built using semantic HTML5
 
 ## 🚀 Live Demo
 
-Check out the live application here: **[Live Demo Link](https://github.io)**
+Check out the live application here: **[Live Demo Link](https://mathewjebis.github.io/Form-Validation/)**
 
 ## 🛠️ Built With
 
