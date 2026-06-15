@@ -6,12 +6,6 @@ A sleek, modern, and secure **Account Creation Form** built using semantic HTML5
 
 Check out the live application here: **[Live Demo Link](https://mathewjebis.github.io/Form-Validation/)**
 
-## 🛠️ Built With
-
-![HTML5](https://shields.io)
-![CSS3](https://shields.io)
-![JavaScript](https://shields.io)
-
 ## ✨ Features
 
 ### 📋 Custom Validation Rules
@@ -52,7 +46,7 @@ To run this project locally, simply follow these steps:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com
+   git clone https://github.com/mathewjebis/Form-Validation.git
    ```
 
 2. **Navigate to the project folder:**
