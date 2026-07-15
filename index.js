@@ -8,6 +8,9 @@ const patterns = {
 const form = document.getElementById("form-validate");
 const successBanner = document.getElementById("success-banner");
 const successMessage = document.getElementById("success-message");
+const submitBtn = document.getElementById("submit-btn");
+const passwordInput = document.getElementById("password");
+const confirmPasswordInput = document.getElementById("confirmPassword");
 
 // Show error message
 function showError(errorId, message, inputId) {
@@ -40,6 +43,14 @@ function togglePassword(inputId, btn) {
     btn.textContent = "Show";
   }
 }
+
+// Single delegated listener for both "Show/Hide" buttons instead of
+// an inline onclick on each one.
+document.querySelectorAll(".toggle-password").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    togglePassword(btn.dataset.target, btn);
+  });
+});
 
 // Password strength checker
 function checkPasswordStrength(password) {
@@ -79,9 +90,86 @@ function checkPasswordStrength(password) {
   }
 }
 
+function validateUserName(value) {
+  if (value === "") {
+    showError("uName-error", "Full name is required", "userName");
+    return false;
+  } else if (!patterns.userName.test(value)) {
+    showError(
+      "uName-error",
+      "Enter first and last name (e.g. John Doe)",
+      "userName",
+    );
+    return false;
+  }
+  clearError("uName-error", "userName");
+  return true;
+}
+
+function validateEmail(value) {
+  if (value === "") {
+    showError("mail-error", "Email address is required", "email");
+    return false;
+  } else if (!patterns.email.test(value)) {
+    showError("mail-error", "Enter a valid email address", "email");
+    return false;
+  }
+  clearError("mail-error", "email");
+  return true;
+}
+
+function validatePassword(value) {
+  // Not trimmed — a password's leading/trailing spaces are part of what
+  // the user actually typed, and silently stripping them changes the
+  // password without telling them.
+  if (value === "") {
+    showError("password-error", "Password is required", "password");
+    return false;
+  } else if (value.length < 6) {
+    showError(
+      "password-error",
+      "Password must be at least 6 characters",
+      "password",
+    );
+    return false;
+  } else if (value.length > 20) {
+    showError(
+      "password-error",
+      "Password must not exceed 20 characters",
+      "password",
+    );
+    return false;
+  }
+  clearError("password-error", "password");
+  return true;
+}
+
+function validateConfirmPassword(value, password) {
+  if (value === "") {
+    showError(
+      "cPassword-error",
+      "Please confirm your password",
+      "confirmPassword",
+    );
+    return false;
+  } else if (value !== password) {
+    showError("cPassword-error", "Passwords do not match", "confirmPassword");
+    return false;
+  }
+  clearError("cPassword-error", "confirmPassword");
+  return true;
+}
+
 // Real-time password strength
-document.getElementById("password").addEventListener("input", function () {
+passwordInput.addEventListener("input", function () {
   checkPasswordStrength(this.value);
+
+  // Keep the confirm-password check live: if the user already typed a
+  // confirmation, re-validate it as they edit the original password,
+  // instead of only checking on submit.
+  if (confirmPasswordInput.value !== "") {
+    validateConfirmPassword(confirmPasswordInput.value, this.value);
+  }
 });
 
 // Validate form on submit
@@ -90,85 +178,38 @@ form.addEventListener("submit", function (event) {
 
   let userName = document.getElementById("userName").value.trim();
   let email = document.getElementById("email").value.trim();
-  let password = document.getElementById("password").value.trim();
-  let confirmPassword = document.getElementById("confirmPassword").value.trim();
+  let password = passwordInput.value;
+  let confirmPassword = confirmPasswordInput.value;
 
-  let isValid = true;
+  let isNameValid = validateUserName(userName);
+  let isEmailValid = validateEmail(email);
+  let isPasswordValid = validatePassword(password);
+  let isConfirmValid = validateConfirmPassword(confirmPassword, password);
 
-  // Validate username
-  if (userName === "") {
-    showError("uName-error", "Full name is required", "userName");
-    isValid = false;
-  } else if (!patterns.userName.test(userName)) {
-    showError(
-      "uName-error",
-      "Enter first and last name (e.g. John Doe)",
-      "userName",
-    );
-    isValid = false;
-  } else {
-    clearError("uName-error", "userName");
-  }
-
-  // Validate email
-  if (email === "") {
-    showError("mail-error", "Email address is required", "email");
-    isValid = false;
-  } else if (!patterns.email.test(email)) {
-    showError("mail-error", "Enter a valid email address", "email");
-    isValid = false;
-  } else {
-    clearError("mail-error", "email");
-  }
-
-  // Validate password
-  if (password === "") {
-    showError("password-error", "Password is required", "password");
-    isValid = false;
-  } else if (password.length < 6) {
-    showError(
-      "password-error",
-      "Password must be at least 6 characters",
-      "password",
-    );
-    isValid = false;
-  } else if (password.length > 20) {
-    showError(
-      "password-error",
-      "Password must not exceed 20 characters",
-      "password",
-    );
-    isValid = false;
-  } else {
-    clearError("password-error", "password");
-  }
-
-  // Validate confirm password
-  if (confirmPassword === "") {
-    showError(
-      "cPassword-error",
-      "Please confirm your password",
-      "confirmPassword",
-    );
-    isValid = false;
-  } else if (confirmPassword !== password) {
-    showError("cPassword-error", "Passwords do not match", "confirmPassword");
-    isValid = false;
-  } else {
-    clearError("cPassword-error", "confirmPassword");
-  }
+  let isValid = isNameValid && isEmailValid && isPasswordValid && isConfirmValid;
 
   // Success
   if (isValid) {
     successMessage.textContent =
       "Welcome " + userName + "! Account created successfully!";
     successBanner.classList.add("show");
-    form.reset();
-    // Reset input states
-    document.querySelectorAll("input").forEach((input) => {
-      input.classList.remove("valid", "invalid");
-    });
-    document.getElementById("password-strength").classList.remove("show");
+
+    // Briefly disable the submit button — gives real tactile feedback
+    // (the .submit-btn:disabled style already existed but was never used)
+    // and prevents an accidental double-submit.
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Creating Account...";
+
+    setTimeout(() => {
+      form.reset();
+      document.querySelectorAll("input").forEach((input) => {
+        input.classList.remove("valid", "invalid");
+      });
+      document.getElementById("password-strength").classList.remove("show");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Create Account";
+    }, 600);
+
     // Hide success after 4 seconds
     setTimeout(() => {
       successBanner.classList.remove("show");
@@ -176,29 +217,20 @@ form.addEventListener("submit", function (event) {
   }
 });
 
-// Real-time validation on blur
+// Real-time validation on blur — now consistent across all four fields,
+// not just Name and Email.
 document.getElementById("userName").addEventListener("blur", function () {
-  let value = this.value.trim();
-  if (value === "") {
-    showError("uName-error", "Full name is required", "userName");
-  } else if (!patterns.userName.test(value)) {
-    showError(
-      "uName-error",
-      "Enter first and last name (e.g. John Doe)",
-      "userName",
-    );
-  } else {
-    clearError("uName-error", "userName");
-  }
+  validateUserName(this.value.trim());
 });
 
 document.getElementById("email").addEventListener("blur", function () {
-  let value = this.value.trim();
-  if (value === "") {
-    showError("mail-error", "Email address is required", "email");
-  } else if (!patterns.email.test(value)) {
-    showError("mail-error", "Enter a valid email address", "email");
-  } else {
-    clearError("mail-error", "email");
-  }
+  validateEmail(this.value.trim());
+});
+
+passwordInput.addEventListener("blur", function () {
+  validatePassword(this.value);
+});
+
+confirmPasswordInput.addEventListener("blur", function () {
+  validateConfirmPassword(this.value, passwordInput.value);
 });

@@ -1,60 +1,62 @@
-# Modern Registration Form with Live Validation
+# Registration Form with Live Validation
 
-A sleek, modern, and secure **Account Creation Form** built using semantic HTML5, pure CSS3 variables, and vanilla JavaScript. This project features dynamic client-side validation using regular expressions, an asynchronous real-time password strength checker, and physical-tactile button states.
+A registration form built with vanilla HTML, CSS, and JavaScript — no frameworks, no libraries. Focused on real client-side validation: regex-based rules, a password strength meter, and validation that runs consistently across every field, not just on submit.
 
-##  Live Demo
+## Live Demo
 
-Check out the live application here: **[Live Demo Link](https://mathewjebis.github.io/Form-Validation/)**
+[View Live Demo](https://mathewjebis.github.io/Form-Validation/)
 
-##  Features
+## Features
 
-###  Custom Validation Rules
+### Validation Rules
 
-- **Full Name**: Forces an explicit `"Firstname Lastname"` pattern using regex validation.
-- **Email Address**: Restricts inputs to valid standard email formatting syntaxes.
-- **Password Constraints**: Requires a standard character limit boundary between 6 and 20 characters long.
-- **Cross-Field Equality**: Real-time evaluation checks to confirm password matching.
+- **Full Name**: must match a `Firstname Lastname` pattern (two words, letters only)
+- **Email**: validated against a standard email regex
+- **Password**: 6–20 characters
+- **Confirm Password**: must match the password — checked live as you type, not just on submit (if you fill in Confirm Password first and then go back and edit the original password, the match check updates immediately)
+- All four fields validate consistently: as you leave each field (`blur`), and again on submit
 
-###  Smart Password Strength Meter
+### Password Strength Meter
 
-Evaluates passwords dynamically across a 5-tier complexity framework (Length checks, Capital letters, Numerical additions, and Special symbols):
+A simple 5-point scoring system (length ≥ 6, length ≥ 10, uppercase letter, number, special character) maps to three visual states:
 
--  **Weak (≤1 point)**: Generates a 25% width indicator filled with `#e74c3c` crimson red.
--  **Medium (2-3 points)**: Generates a 60% width indicator filled with `#f39c12` flat orange.
--  **Strong (≥4 points)**: Generates a 100% width indicator filled with `#4caf50` emerald green.
+- **Weak** (≤1 point): red, 25% bar
+- **Medium** (2–3 points): orange, 60% bar
+- **Strong** (≥4 points): green, 100% bar
 
-###  Premium UI/UX Details
+### UI Details
 
-- **Mesh Background**: Wrapped completely over a premium modern dark multi-stop linear gradient.
-- **Asynchronous Form Blur Events**: Triggers individual element evaluations instantly when fields lose user focus (`blur`), preventing disruptive error spam while typing.
-- **Visibility Toggles**: Smooth multi-type inline absolute action links toggle values instantly from hidden passwords to visible plain strings.
-- **Auto-Dismiss Banner**: Displays an informative personalized success banner that resets your DOM node architecture and automatically dismisses itself after 4 seconds.
-- **Mobile Responsive Layout**: Features robust element scaling logic using media rules tailored down to `480px` screen widths.
+- Show/Hide toggle on both password fields (single delegated click listener, not a handler per button)
+- Success banner on valid submission, auto-dismisses after 4 seconds
+- Submit button briefly disables during "submission" to prevent double-submit
+- Error messages use `aria-live="polite"` so screen readers announce validation errors as they appear
+- Responsive down to 480px screens
 
-##  Project Structure
+## Notes on scope
 
-```text
-├── index.html          # Semantic layout structures and DOM boundaries
-├── index.css           # Modern CSS transitions, gradients, and custom themes
-└── index.js            # Validation algorithms, Event Listeners, and UI mechanics
+- This is a front-end-only demo — there's no backend, so "Create Account" doesn't actually create anything. It's here to demonstrate validation logic and UX patterns.
+- Passwords are intentionally **not** trimmed of leading/trailing whitespace — trimming would silently change what the user typed, which isn't appropriate for a password field.
+
+## Project Structure
+
+```
+├── index.html   # Form markup
+├── index.css    # Styling, validation states, responsive layout
+└── index.js     # Validation logic, password strength, event handling
 ```
 
-##  Setup & Installation
+## Getting Started
 
-To run this project locally, simply follow these steps:
+No build step required — open `index.html` directly in a browser, or serve it locally:
 
-1. **Clone the repository:**
+```bash
+git clone https://github.com/mathewjebis/Form-Validation.git
+cd Form-Validation
+npx serve .
+```
 
-   ```bash
-   git clone https://github.com/mathewjebis/Form-Validation.git
-   ```
+## Author
 
-2. **Navigate to the project folder:**
+**S. Mathew Jebis**
 
-   ```bash
-   cd your-repository-name
-   ```
-
-3. **Open the project:**
-   - Double-click `index.html` to execute directly inside your preferred modern web browser.
-   - Alternatively, right-click and use the **Live Server** extension in VS Code for real-time live-reloading code changes.
+- GitHub: [mathewjebis](https://github.com/mathewjebis)
